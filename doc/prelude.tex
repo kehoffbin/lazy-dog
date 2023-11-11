@@ -1,0 +1,21 @@
+\usepackage{listings}
+\usepackage{xspace}
+\usepackage[hidelinks]{hyperref}
+
+\setlength{\parindent}{0pt}
+\renewcommand\v[1]{\texttt{#1}}
+\newcommand\lazydog{\v{lazy-dog}\xspace}
+\def\focus{0}
+\newcommand\note[1]{{\it Note:} {#1}}
+\newcounter{rememberEnumi}
+
+\newcommand\tclass[1]{$\langle${\it{#1}}$\rangle$}
+\def\tcom{\tclass{comment}\xspace}
+\def\tident{\tclass{identifier}\xspace}
+\def\ttrait{\tclass{trait name}\xspace}
+\def\tsym{\tclass{symbol}\xspace}
+\def\tuint{\tclass{unsigned integer literal}\xspace}
+\def\tint{\tclass{integer literal}\xspace}
+\def\tfl{\tclass{floating literal}\xspace}
+\def\tstr{\tclass{string literal}\xspace}
+\def\tinv{\tclass{invalid}\xspace}
