@@ -8,7 +8,7 @@ std::vector<std::string> tokenClassNames = {
     "Com", "Id ", "Tr ", "Sym", "Int", "Fl ", "Str", "Inv"
 };
 
- int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
     std::string fileContent("hello world");
     std::vector<Token> tokens = Tokenizer(fileContent).tokenize();
 

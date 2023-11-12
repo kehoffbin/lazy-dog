@@ -8,10 +8,25 @@ Tokenizer::Tokenizer(std::string &fileContent_) {
 
 std::vector<Token> Tokenizer::tokenize() {
     std::vector<Token> tokens;
+    advanceWhitespace();
     while(i<n) {
         tokens.push_back(nextToken());
+        advanceWhitespace();
     }
     return tokens;
+}
+
+// checks whether a character is whitespace
+// as defined by lazy-dog
+// that is: space, newline or tab
+bool isWhitespace(char c) {
+    return c == ' ' || c == '\n' || c == '\t';
+}
+
+// advances i until there is no more whitespace
+void Tokenizer::advanceWhitespace() {
+    while(i<n && isWhitespace(fileContent[i])) 
+        i++;
 }
 
 // advances i and returns a corresponding token
@@ -71,7 +86,7 @@ int Tokenizer::identifierLength() {
 // starting at i
 // that is of type class TraitName
 int Tokenizer::traitNameLength() {
-    return 2;
+    return 1;
 }
 
 // figures out the maximum length of a substring of fileContent
