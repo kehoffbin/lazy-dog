@@ -1,11 +1,11 @@
-lazy-dog: main.o tokenizer.o
-	g++ main.o tokenizer.o -o lazy-dog
+lazy-dog: main.o tokenizer/main.o
+	g++ main.o tokenizer/main.o -o lazy-dog
 
-main.o: main.cc tokenizer.h
+main.o: main.cc tokenizer/mod.h
 	g++ -c main.cc
 
-tokenizer.o: tokenizer.cc tokenizer.h
-	g++ -c tokenizer.cc
+tokenizer/main.o: tokenizer/*
+	make --no-print-directory -C tokenizer
 
 clean:
-	rm lazy-dog *.o
+	rm lazy-dog *.o */*.o
