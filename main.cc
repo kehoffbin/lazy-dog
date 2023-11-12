@@ -9,7 +9,7 @@ std::vector<std::string> tokenClassNames = {
 };
 
 int main(int argc, char *argv[]) {
-    std::string fileContent("hello world");
+    std::string fileContent("123\"str\\\"ing\"::hello");
     std::vector<Token> tokens = Tokenizer(fileContent).tokenize();
 
     for (Token token:tokens) {

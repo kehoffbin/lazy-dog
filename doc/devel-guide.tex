@@ -216,12 +216,13 @@ It must not be the concatenation of two or more
 elementary symbols.
 The elementary symbols are precisely the following:
 \begin{verbatim}
-    & &! &? ( ) , -> . .. ... : = => > [ ] _ __ { } |
+    & &! &? ( ) , -> . .. ... : :: = => > [ ] _ __ { } |
 \end{verbatim}
 Elementary symbols that are themselves concatenations of
 other elementary symbols are an exception to this rule.
 
-A symbol must not be a single dash \v-.
+A trailing dash is considered elementary.
+
 \subsubsection{Integer Literals}
 An \tint is a string consisting of
 \begin{itemize}
@@ -241,16 +242,18 @@ Examples of integer literals:
 \begin{verbatim}
     -123 0 1 2 0020 99999999999999999999999999999999999999999999
 \end{verbatim}
+An integer literal must not be followed by \v e or \v.
 
 \subsubsection{Floating Literals}
 A \tfl is a string of any of the following patterns:
 \begin{quote}
     \tint\v.\tuint\\
     \tint\v.\tuint e\tint\\
-    \tint\v e\tint\\
+    \tint\v e\tint
 \end{quote}
 Note that the whitespace in above patterns is 
 a display error. A \tfl does not contain whitespace.
+A floating literal must not be followed by another \v e or \v.
 
 An \tuint is an \tint not containing a dash.
 

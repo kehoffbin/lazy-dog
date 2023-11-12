@@ -3,6 +3,8 @@
 
 #include<string>
 #include<vector>
+#include<iostream>
+#define PRINT(x) std::cout << #x << ": " << x << std::endl;
 
 enum TokenClass {
     Comment,
@@ -12,8 +14,8 @@ enum TokenClass {
     IntegerLiteral,
     FloatingLiteral,
     StringLiteral,
-    Invalid,
-    NUMBER_OF_ELEMENTS // should always be last enum member
+    Invalid, // must be second to last
+    NUMBER_OF_ELEMENTS // must be last
 };
 
 struct Token {
