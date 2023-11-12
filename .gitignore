@@ -1,5 +1,6 @@
 # c++
 *.o
+/lazy-dog
 
 # latex
 *.aux
