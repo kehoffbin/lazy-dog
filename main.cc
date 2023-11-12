@@ -1,6 +1,22 @@
 #include "tokenizer.h"
+#include <iostream>
+#include <vector>
+#include <string>
 
-int main(int argc, char *argv[]) {
+
+std::vector<std::string> tokenClassNames = {
+    "Com", "Id ", "Tr ", "Sym", "Int", "Fl ", "Str", "Inv"
+};
+
+ int main(int argc, char *argv[]) {
     std::string fileContent("hello world");
-    Tokenizer(fileContent).tokenize();
+    std::vector<Token> tokens = Tokenizer(fileContent).tokenize();
+
+    for (Token token:tokens) {
+        std::cout << tokenClassNames[(int)token.tokenClass];
+        std::cout << ": ";
+        std::cout << token.content;
+        std::cout << std::endl;
+    }
+
 }
