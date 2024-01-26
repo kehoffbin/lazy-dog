@@ -31,7 +31,7 @@ as each language aspect is discussed in all chapters.
 
 The {\bf first chapter}
 \footnote{A chapter refers to a \v{\textbackslash section} in \LaTeX}
-Wis devoted to laying
+is devoted to laying
 out general information regarding this document
 and the language as a whole.\\
 
@@ -78,7 +78,7 @@ The design of \lazydog has the following primary goals:
     \item {\bf Ease of Typing:} \lazydog code should be
     reasonably easy to type with a German quertz keyboard.
     \begin{itemize}
-        \item banning of the backtick, is is the worst character
+        \item banning of the backtick, it is the worst character
         \item identifiers in \v{dash-case}
         \item a general preference for words over special characters
     \end{itemize}
@@ -92,7 +92,7 @@ The design of \lazydog has the following primary goals:
 The following secondary goals, while beneficial, are of lesser concern.
 \begin{enumerate}
     \setcounter{enumi}{\therememberEnumi}
-    \item {\bf Simplicity:} simplicity is intrincically valuable,
+    \item {\bf Simplicity:} simplicity is intrinsically valuable,
     however the language should not be simplified to the point
     where it introduces unproductive abstraction
     \item {\bf Performance:} compilation and execution of a
@@ -158,13 +158,44 @@ Here, whitespace specifically refers to
     \item the newline character \verb$\n$
     \item the tab character \verb$\t$
 \end{itemize}
+\fi
 
 \subsubsection{Comments}
-A comment is any string that
+A \tcom is any string that
 \begin{enumerate}
     \item starts with the hash character \v{\#}
-    \item does not contain a newline \verb$\n$
+    \item followed by a non-hash character
+    \item and does not contain a newline \verb$\n$
 \end{enumerate}
+
+Alternatively, a (multiline/inline) comment is a string that
+starts and ends with at least two hashes \v{\#}.
+If the end contains three or more hashes, the remainder of the line
+is also part of the comment.
+As such, the following are comments:
+\begin{verbatim}
+# single line comment
+
+code ## inline-comment ## more-code
+
+# multi
+# line
+# comment
+
+###
+multi
+line 
+comment
+### (also part of the comment)
+
+##
+multi
+line
+comment
+## code
+
+\end{verbatim}
+
 \subsubsection{Identifiers}
 An \tident is a string consisting of
 \begin{itemize}
@@ -262,7 +293,6 @@ Examples of \tfl:
     3.14 10e99999 -1.75e-14 0.0
 \end{verbatim}
 
-\fi
 \subsubsection{String Literals}
 A \tstr is any string
 \begin{itemize}
