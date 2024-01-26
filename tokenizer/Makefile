@@ -1,10 +1,13 @@
 cc_files=$(wildcard *.cc)
 o_files=$(patsubst %.cc,%.o,$(cc_files))
 
+# partially link all .o files together into
+# main.o
+# note that main.o is not in o_files, since there is no main.cc
 main.o: $(o_files)
 	echo $(o_files)
 	@echo ld -r *.o
-	@ld -r $(o_files)
+	@ld -r $(o_files) -o main.o
 	
 mod.o: mod.cc mod.h whitespace.h
 	g++ -c mod.cc
