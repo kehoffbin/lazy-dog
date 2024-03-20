@@ -1,6 +1,5 @@
 #include "hash.h"
 #include <stdio.h>
-#include <stdlib.h>
 
 int main() {
     struct HashTable hashTable = make_hash_table();
