@@ -1,11 +1,3 @@
 # c++
 *.o
 /lazy-dog
-
-# latex
-*.aux
-*.log
-*.pdf
-*.toc
-*.dvi
-*.out
