@@ -1,12 +1,10 @@
-#include "vec.h"
+#include "hash.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 int main() {
-    struct Vec vec = make_vec();
-    for(size_t i = 0; i <= 100; i++) {
-        push(&vec, (void*) (i*i));
-    }
-
-    free(vec.data);
+    struct HashTable hashTable = make_hash_table();
+    push_h(&hashTable, "Hallo", 3);
+    push_h(&hashTable, "Welt", 6);
+    printf("%d", find(&hashTable, "Hallo"));
 }

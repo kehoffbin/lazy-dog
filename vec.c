@@ -9,14 +9,17 @@ struct Vec make_vec() {
     return vec;
 }
 
-void push(struct Vec *vec, void* value) {
+int push(struct Vec *vec, void* value) {
     if(vec->size > vec->capacity) {
         vec->capacity *= 2;
         vec->data = realloc(vec->data, vec->capacity * sizeof(void*));
     }
 
-    vec->data[vec->size] = value;
+    int i = vec->size;
+    vec->data[i] = value;
     vec->size += 1;
+    return i;
+    
 }
 
 void* get(struct Vec *vec, int i) {
