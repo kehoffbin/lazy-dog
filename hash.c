@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-const int size = 1;
+const int size = 256;
 
 // djb2 by Dan Bernstein
 unsigned long hash(unsigned char *str) {
