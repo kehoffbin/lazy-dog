@@ -19,7 +19,17 @@ def result :Maybe<Else> _else { body }
 def<T,U>
 	_for i:Ident _in iter:Iter<T> { body } 
 -> {
-	while i = (iter next) :Some
+	loop {
+		iter next
+		check :? None {
+			break
+		}
+
+		{
+    		-> i
+    		body
+		}
+	}
 }
 
 def<T> ( T ) -> {
@@ -29,13 +39,14 @@ def<T> ( T ) -> {
 	
 def _main -> fn {
 	for i in 1 2 3..=100 {
-		if 3 divides i then
-			"fizz"
-		if 5 divides i then
-			"buzz"
-
+		(
+    		if 3 divides i then
+    			"fizz"
+    		if 5 divides i then
+    			"buzz"
+		)
+		
 		join("-")
-		check(not is-empty) else i
 		print
 	}
 }
