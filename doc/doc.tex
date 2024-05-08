@@ -1,0 +1,191 @@
+\documentclass{article}
+\title{lazy-dog minimal documentation}
+\author{Kerstin Hoffmann}
+\date{\today}
+
+\setlength{\parindent}{0pt}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\section{This document}
+This is a WIP minimal documentation for
+the programming language lazy-dog.
+The contents of this document are subject to change
+as development goes on.
+It is furthermore not guaranteed that this document 
+is fully up to date.\\
+
+Furthermore, this document tries to be compiler agnostic.
+
+\section{Preprocessing}
+A preprocessor directive
+is a line that starts with \verb.%..
+\subsection{include}
+\begin{verbatim}
+def %include !? Include... \n;
+def :Include (Include...);
+def :Include Identifier;
+def :Include Identifier / Include;
+\end{verbatim}
+Each Include is a set of source file paths.
+Each path points either to a file in the std directory
+or in the local directory.
+Prefixing a path with \verb.std/. or \verb.local/.
+makes this explicit, otherwise the local path
+has priority.\\
+
+A source file ends in \verb.lzy.. 
+Including a file twice has no effect,
+unless \verb.%include! file. is used.
+
+Once files \verb.file1. to \verb.filen. have been
+included, the file
+\begin{verbatim}
+    file1_x_file2_x_ ... _x_filen.lzy
+\end{verbatim}
+if it exists
+is also included after the place where
+\verb.filen. was included.
+
+The files have to be sorted in alphabetical order.
+Such combination files of small $n$ are included first.
+
+\section{Lexing}
+Lexical analysis transforms a stream of source
+lines into a stream of lexemes.\\
+
+\subsection{Vocabulary}
+
+An \textbf{Identifier} is a name, type name or symbol.
+An identifier is a lexeme.\\
+
+A \textbf{Token} is a number that points to a string
+representing an identifier.\\
+
+A \textbf{Lexeme} corresponds to a substring of 
+the source code. However, it is an actual object in lazy-dog.
+It can be either
+\begin{itemize}
+    \item an identifier. 
+    In that case, the lexeme has the token value.
+    \item a string or number literal.
+    Here, the lexeme has a string representing
+    the contents of the a string or the digits
+    of a number.
+\end{itemize}
+Lexemes can be manipulated in a number of ways,
+but this is not part of lexical analysis.
+
+\subsection{Lexical Rules}
+No lexeme spans multiple lines, including string literals.\\
+
+\textbf{Whitespace} (ie space, newline and tab) in between
+lexemes is discarded.\\
+
+\textbf{Comments} starting with \verb.#. until the end of the line
+are ignored.\\
+
+A \textbf{Name} contains lowercase letters,
+underscores and digits.
+It starts with a letter and doesn't end in a underscore.\\
+
+A \textbf{Type Name} contains letters and digits.
+It starts with an uppercase letter
+and doesn't end in a digit.\\
+
+\begin{samepage}
+    A \textbf{Symbol} is a single character of the
+    following string:
+    \begin{verbatim}
+        !$%&'()*+,-./:;<=>?@[\]^_{|}~
+    \end{verbatim}
+    These are all printable ascii characters except letters, digits, 
+    double quotes \verb."., the hash \verb.#. and
+    the backtick \verb.`..
+\end{samepage}\\
+
+A \textbf{Number Literal} consists only of digits.
+Underscores between the digits are allowed
+and are just ignored.
+Note that a number literal is \emph{not} a number,
+so we don't care about representing negative numbers
+and the likes right now.\\
+
+A \textbf{String Literal} starts with double quotes
+and ends with double quotes following an even amount
+of backslashes (including 0). 
+Normal C style escape rules apply.
+The outer double quotes are discarded.
+
+\section{Objects and Types}
+As mentioned above, lexemes are objects.
+All data in lazy-dog is just a list of objects.
+
+Each Object has a type.
+
+\subsection{Data}
+For each non-negative multiple of 8 $n$, there
+is the type \verb.Data.$n$,
+for example \verb.Data64. or \verb.Data16..\\
+
+This type denotes that an object represents
+$n$ bits of data. Keep in mind that due to 
+alignment/padding issues, the actual size of the object
+might differ from $n$.\\
+
+Each object has to have a Data type.
+
+\subsection{Concatenation}
+Two objects \verb.t. and \verb.u. of types 
+\verb.T. and \verb.U. can be concatenated
+into \verb.t u. which has type \verb.T U.\\
+
+Concatenation is associative and has a neutral
+element, the empty type.\\
+
+The resulting object has a Data type that is the
+sum of the Data types of \verb.t. and \verb.u..
+
+\subsection{Tags}
+Many types are not subsets of Data types.
+They are called \textbf{Tags}.
+Such types of course can't have any objects associated
+to them, but they can be used in the type algebra
+to produce other types.\\
+
+If \verb.T. has data and \verb.U. is a tag,
+then \verb.T U. is the type \verb.T. \emph{tagged with}
+\verb.U..
+If both \verb.T. and \verb.U. are tags, \verb.T U.
+is their \emph{union}.\\
+
+This operation is not associative. The following rules
+apply however:
+\begin{verbatim}
+    D (T1 T2) == (D T1) T2
+    (T1 T2) T3 == T1 (T2 T3)
+    T T == T 
+    T1 T2 == T2 T1
+\end{verbatim}
+This means that unioning tags is associative, 
+idempotent and commutative.
+But tagging data generally is not,
+ie in general:
+\begin{verbatim}
+    D1 D2 T == D1 (D2 T) != (D1 D2) T
+\end{verbatim}
+
+\subsection{Alternation}
+Two tags \verb.T1., \verb.T2. may be alternated.
+This gives \verb.T1|T2.. 
+Alternation is associative. 
+If an alternation
+tags a data type \verb.D.
+then each object of type \verb.D T1|T2.
+also stores an integer that tells us which of 
+these tags is active.
+
+This can be checked via the builtin function
+\verb.is x type.
+\end{document}
