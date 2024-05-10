@@ -1,0 +1,62 @@
+(
+	x
+	y
+) == (x | y)
+
+(
+	x
+		y
+		z
+) == (x (y) (z))
+
+(|f x, y, z|) == (|f (x) (y) (z)|)
+
+def . = cat
+
+
+x | f
+x | (fn f)
+
+x | fn f
+
+iter | map (square f) x
+
+split by |
+for each line:
+	consider first value
+	figure out arity n
+	
+	
+	
+
+
+range n+(max 4, n+1), n+2 
+
+
+range
+	n+max 4, n+1
+	n+2
+
+let sum<T:Add> = fold add
+
+
+
+trait T:Add
+	add :T T -> T
+	zero :T
+
+Add::add<T>
+
+trait T:Iter<U>
+	next :&T ->! Option<U> 
+
+trait T:As<U>
+	as :T -> U
+
+let iter :T->Iter<U>
+
+
+
+let map -> Iter<U> = fn i:Iter<T> f:T->U {
+	->Iter<U> next = (&i next! | f) 
+}
