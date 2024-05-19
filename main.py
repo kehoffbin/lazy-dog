@@ -1,3 +1,3 @@
-from parse.chars import ParseChar
+from parse.tokens import ParseIdent
 
-print(ParseChar( lambda c: c.isalnum()).parse("hello world", 0))
+print(ParseIdent().parse("hel9_e1)lo world", 0).value())

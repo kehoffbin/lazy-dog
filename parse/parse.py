@@ -12,8 +12,8 @@ class Node:
 
 
 	# get the value of the substring this node corresponds to
-	def value():
-		return file[start:end]
+	def value(self):
+		return self.file[self.start:self.end]
 
 
 # abstract base class
