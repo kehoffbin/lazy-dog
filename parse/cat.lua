@@ -6,7 +6,8 @@ function cat(file, i, ...)
 	local j = i
 	elems = {}
 	for _,parser in ipairs(parsers) do
-		node = parser(file, j)()
+		-- defn parser just in case
+		node = defn(parser)(file, j)
 		if node == nil then
 			return nil
 		end
@@ -15,4 +16,13 @@ function cat(file, i, ...)
 		j = node.j
 	end
 	return table.unpack(elems)
+end
+
+-- joins many nodes into one, discarding the arguments
+function join(...)
+	local nodes = table.pack(...)
+	return {
+		i = nodes[1].i,
+		j = nodes[#nodes].j
+	}
 end

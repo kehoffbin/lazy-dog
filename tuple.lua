@@ -2,7 +2,7 @@
 
 -- checks if a value is a tuple
 function is_tuple(t)
-	return type(t)=="table" and t.is_tuple
+	return type(t)=="table" and t.is_tuple == true
 end
 
 -- turns args into tuple via
@@ -10,14 +10,12 @@ end
 -- case 2: tuple(a) = a
 function tuple(...)
 	local args = table.pack(...)
-
 	-- case 1
 	if args.n ~= 1 then
 		args.is_tuple = true
 		return args
 	end
-	
-	-- case 2
+
 	return args[1]
 end
 

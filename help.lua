@@ -14,3 +14,9 @@ function Help.concat_lists(l1, l2)
 
 	return result
 end
+
+function print_table(table)
+	for i,v in pairs(table) do
+		print(i, v)
+	end
+end

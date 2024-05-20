@@ -9,11 +9,15 @@ require("tuple")
 -- our metatable
 Fn = {}
 
+function is_fn(f)
+	return getmetatable(f) == Fn
+end
+
 -- turns regular boring old function into magical function
 -- ie a table {raw = f}
 function fn(f)
 	-- if f is already magical, do nothing
-	if getmetatable(f) == Fn then
+	if is_fn(f) then
 		return f
 	end
 
@@ -30,6 +34,16 @@ function fn(f)
 	-- and set the appropriate metatable
 	local f = {raw=f}
 	setmetatable(f, Fn)
+	return f
+end
+
+-- demagicalizes f
+function defn(f)
+	if is_fn(f) then
+		return f.raw
+	end
+
+	-- if f is already boring, return it
 	return f
 end
 
@@ -73,9 +87,17 @@ function Fn.__call(f, ...)
 	end >> fn(fn)
 end
 
+function Fn.__bor(f,g)
+	return function(...)
+		local args = tuple(...)
+
+		-- make f and g magical just in case
+		return args >> fn(f) >> fn(g)
+	end >> fn(fn)
+end
+
 -- a few useful functions
 -- projects a table onto some index
 function pr(table, index)
 	return table[index]
 end
-
