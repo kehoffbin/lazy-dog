@@ -7,7 +7,7 @@ function cat(file, i, ...)
 	elems = {}
 	for _,parser in ipairs(parsers) do
 		-- defn parser just in case
-		node = defn(parser)(file, j)
+		node = fn(parser)(file, j)()
 		if node == nil then
 			return nil
 		end

@@ -29,7 +29,7 @@ parse_name = fn(cat)(
 
 parse_type_name = fn(cat)(
 	fn(parse_char)(isupper),
-	fn(parse_char)(function(c)
+	fn(parse_chars)(function(c)
 		return isupper(c) or isdigit(c)
 	end)
-) | fn(join) | fn(flag)("type_name")
+) --| fn(join) | fn(flag)("type_name")
