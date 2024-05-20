@@ -1,4 +1,3 @@
-# lazy-dog
-A statically typed programming language that gets compiled to C, the compiler written in C++
-
-Currently under construction
+# hechle
+A prefix postfix mildly functional programming language with a compiler written in lua.
+Currently under construction.
