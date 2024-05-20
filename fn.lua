@@ -87,12 +87,18 @@ function Fn.__call(f, ...)
 	end >> fn(fn)
 end
 
+-- compose functions f and g
+-- if f returns nil, let the composition return nil
 function Fn.__bor(f,g)
 	return function(...)
 		local args = tuple(...)
 
 		-- make f and g magical just in case
-		return args >> fn(f) >> fn(g)
+		local x = args >> fn(f)
+		if x == nil then
+			return nil
+		end
+		return x >> fn(g)
 	end >> fn(fn)
 end
 

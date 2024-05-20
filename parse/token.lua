@@ -27,9 +27,10 @@ parse_name = fn(cat)(
 	end)
 ) | fn(join) | fn(flag)("name")
 
+-- type names start with upper, then only contain alnums
 parse_type_name = fn(cat)(
 	fn(parse_char)(isupper),
 	fn(parse_chars)(function(c)
-		return isupper(c) or isdigit(c)
+		return isupper(c) or islower(c) or isdigit(c)
 	end)
-) --| fn(join) | fn(flag)("type_name")
+) | fn(join) | fn(flag)("type_name")
