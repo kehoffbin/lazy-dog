@@ -15,8 +15,20 @@ function Help.concat_lists(l1, l2)
 	return result
 end
 
-function print_table(table)
+local function print_table_tree(table, prefix)
+	if type(table) ~= "table" then
+		print(prefix .. tostring(table))
+		return
+	end
 	for i,v in pairs(table) do
-		print(i, v)
+		print(prefix .. tostring(i))
+		print_table_tree(v, " "..prefix)
 	end
 end
+
+function Help.print_table(table)
+	print_table_tree(table, "")
+	print("")
+	return table
+end
+

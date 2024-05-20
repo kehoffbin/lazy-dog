@@ -1,12 +1,14 @@
-require("fn")
-require("parse.chars")
-require("parse.cat")
 require("parse.token")
-require("parse.either")
+require("help")
 
-file = "hello world"
+local f = assert(io.open("test.lzy", "rb"))
+local file = f:read("*all")
+f:close()
+
 function value(node)
 	return file:sub(node.i, node.j - 1)
 end
-
-return tuple(file, 1) >> fn(maybe)(parse_type_name) >> fn(pr)('type') >> fn(print)
+tokens = tuple(file, 1) >> fn(loop)(parse_token)
+for _, token in ipairs(tokens.elems) do
+	print(token.type, value(token))
+end

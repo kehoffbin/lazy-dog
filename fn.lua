@@ -107,3 +107,11 @@ end
 function pr(table, index)
 	return table[index]
 end
+
+function lookup(index, table)
+	return table[index]
+end
+
+function eq(x,y)
+	return x == y
+end

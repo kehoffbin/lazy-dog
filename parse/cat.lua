@@ -1,13 +1,14 @@
 -- (...) are parsers, ie magic fns
 -- that expect (file,i)
 -- parses only if they parse in sequence
+require("help")
 function cat(file, i, ...)
 	local parsers = table.pack(...)
 	local j = i
-	elems = {}
+	local elems = {}
 	for _,parser in ipairs(parsers) do
 		-- defn parser just in case
-		node = fn(parser)(file, j)()
+		local node = fn(parser)(file, j)()
 		if node == nil then
 			return nil
 		end

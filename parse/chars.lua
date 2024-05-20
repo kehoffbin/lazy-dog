@@ -16,3 +16,15 @@ function parse_chars(file, i, pred)
 
 	return {i = i, j = j}
 end
+
+-- matches chars while pred holds
+-- need at least one matching char
+function parse_char_s(file, i, pred)
+	local node = parse_chars(file, i, pred)
+
+	if node.i == node.j then
+		return nil
+	end
+
+	return node
+end

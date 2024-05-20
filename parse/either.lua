@@ -7,7 +7,7 @@ function either(file, i, ...)
 	local parsers = table.pack(...)
 	for n,parser in ipairs(parsers) do
 		-- try parsing with parser
-		node = fn(parser)(file, i)()
+		local node = fn(parser)(file, i)()
 		if node ~= nil then
 			node.variant = n
 			return node

@@ -1,3 +1,9 @@
+require("fn")
+require('parse.cat')
+require('parse.chars')
+require('parse.either')
+require('parse.loop')
+
 function islower(c)
 	return string.byte(c) >= string.byte("a")
 		and string.byte(c) <= string.byte("z")
@@ -12,6 +18,18 @@ function isdigit(c)
 	return string.byte(c) >= string.byte("0")
 		and string.byte(c) <= string.byte("9")
 end
+
+-- turns string into dictionary with each character set to true
+local function dictify(str)
+	local dict = {}
+	for i = 1,str:len() do
+		dict[str:sub(i,i)] = true
+	end
+	return dict
+end
+
+local sociable_symbols = dictify(".'!#$%&\\*+-/:;<=>?@[]^_`|~")
+local solitary_symbols = dictify("()[]{},")
 
 -- flags a node to indicate its type
 function flag(node, type)
@@ -34,3 +52,19 @@ parse_type_name = fn(cat)(
 		return isupper(c) or islower(c) or isdigit(c)
 	end)
 ) | fn(join) | fn(flag)("type_name")
+
+parse_symbol = fn(either)(
+	fn(parse_char)(fn(lookup)(solitary_symbols)),
+	fn(parse_char_s)(fn(lookup)(sociable_symbols))
+) | fn(flag)("symbol")
+
+parse_num = fn(parse_char_s)(isdigit) | fn(flag)("num")
+
+parse_white_gap = fn(parse_chars)(function (c)
+	return c == " " or c == "\t" or c == "\n"
+end) | fn(flag)("white_gap")
+
+parse_token = fn(cat)(
+	parse_white_gap,
+	fn(either)(parse_name, parse_type_name, parse_symbol, parse_num)
+) | fn(table.pack) | fn(pr)(2)
