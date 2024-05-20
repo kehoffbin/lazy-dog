@@ -1,7 +1,5 @@
 while! x < 5:
-	x .=! add 1
-
-
+	x .= add 1
 
 # declare x, assigning it a value of 3
 let x = 3
@@ -17,18 +15,16 @@ x = 4
 (x -> 4)
 
 # sets parameter x
-x := 3
-3 ->: x
+\x = 3
+3 -> \x
 
 # sets parameter x
 # if there is no local variable x
 x = 3
 3 -> x
 
-# an alias for x := x
-x :.
-x : ,
-
+# an alias for  \x = x
+\=x
 
 # elementary symbols
 ()[]{},|

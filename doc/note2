@@ -1,0 +1,32 @@
+let a = 3
+let b = a
+b = 4
+print a # 3
+
+let a = 3
+let &b = a
+b = 4
+print a # 4
+
+let a = vect 1 2 3 
+let b = a 
+# creates a copy of a
+
+let a = vect 1 2 3 
+let &b = a 
+# a and b are now indistinguishable
+
+
+let a = vect 1 2 3 
+let b = &a 
+# b is a reference to a
+
+
+let a = 3
+let b = 4
+swap!(&a, &b)
+
+let swap(a:&Num, b:&Num) = fn:
+    let c = ^a
+    ^b = ^a
+    ^a = c
