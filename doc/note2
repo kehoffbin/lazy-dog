@@ -1,32 +1,52 @@
+&3 	-- &Num
+
+
 let a = 3
+a 	-- &?Num
+^a	-- ^Num ie undefined
+&a	-- &Num
+
 let b = a
-b = 4
-print a # 3
+b 	-- &?Num
 
-let a = 3
-let &b = a
-b = 4
-print a # 4
+let c = &a
+c	-- &?&Num
 
-let a = vect 1 2 3 
-let b = a 
-# creates a copy of a
+let &d = &a
+d	-- &?Num 
 
-let a = vect 1 2 3 
-let &b = a 
-# a and b are now indistinguishable
+let &d = a 	-- undefined
 
 
-let a = vect 1 2 3 
-let b = &a 
-# b is a reference to a
+-- copy
+let b = a
+
+-- alias
+let &b = &a
+
+-- reference
+let b = &a
 
 
 let a = 3
 let b = 4
-swap!(&a, &b)
+swap! &a &b
 
-let swap(a:&Num, b:&Num) = fn:
-    let c = ^a
-    ^b = ^a
-    ^a = c
+let swap(&a, &b) = fn:
+    let c = a
+    b = a
+    a = c
+
+def @(Vector<T>, Index)
+
+def List T = () / (T,  List T)
+
+def Index = Num / [Index] / (List Num)
+def @(vect, i) = fn:
+	return get vect i
+
+def @(vect, [i]) = fn:
+	return [vect @i]
+
+def @(vect, i...) = fn:
+	return i map(@vect .)...

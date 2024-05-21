@@ -1,8 +1,9 @@
-require("fn")
+require("fn.fn")
 require('parse.cat')
-require('parse.chars')
 require('parse.either')
 require('parse.loop')
+require('parse.node')
+require('tokenize.chars')
 
 function islower(c)
 	return string.byte(c) >= string.byte("a")
@@ -68,3 +69,13 @@ parse_token = fn(cat)(
 	parse_white_gap,
 	fn(either)(parse_name, parse_type_name, parse_symbol, parse_num)
 ) | fn(table.pack) | fn(pr)(2)
+
+-- parses if the next token matches x exactly
+function parse_exact(file, i, x)
+	local node = fn(parse_token)(file, i)()
+	if node ~= nil and value(node, file) == x then
+		return node
+	end
+
+	return nil
+end

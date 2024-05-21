@@ -4,7 +4,7 @@
 -- - postfix calls
 
 require("help")
-require("tuple")
+require("fn.tuple")
 
 -- our metatable
 Fn = {}
