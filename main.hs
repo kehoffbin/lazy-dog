@@ -1,91 +1,77 @@
-{-# language LambdaCase #-}
-import Prelude hiding (exp)
+import Parser
+
 import Control.Monad (Monad)
 import Control.Applicative
 import Data.Char
 
--- parses start of a string
--- if successful, returns some a and the remainder of the string
-newtype Parser a = Parser {parse :: String -> Maybe(a, String)}
-
-instance Functor Parser where
-    fmap f p = Parser $ \str -> do
-        (x, rest) <- parse p str
-        pure (f x, rest)
-
-instance Applicative Parser where
-    pure x = Parser $ \str -> Just(x, str)
-    pf <*> p = Parser $ \str -> do
-        (f, rest) <- parse pf str
-        parse( f <$> p) rest
-
-join :: Parser (Parser a) -> Parser a
-join pp = Parser $ \str ->
-    (parse pp str) >>= (uncurry parse)
-
-instance Monad Parser where
-    x >>= f = join(fmap f x)
-
-instance Alternative Parser where
-    empty = Parser $ const Nothing
-    p1 <|> p2 = Parser $ \str -> 
-        case parse p1 str of
-            Just(x, rest) -> Just(x, rest)
-            Nothing -> parse p2 str
-
--- parses any single character
-any_char :: Parser Char
-any_char = Parser $ \case
-        "" -> Nothing
-        c:rest -> Just(c, rest)
-
--- parses if p parses and the result satisfies pred
-when :: Parser a -> (a -> Bool) -> Parser a
-when p pred = do
-    x <- p
-    if pred x
-        then pure x
-        else empty
-
--- parse the specific character c
-char :: Char -> Parser Char
-char c = any_char `when` (== c)
-
--- parse a specific string
-string :: String -> Parser String
-string "" = pure ""
-string (c:str) = (:) <$> char c <*> string str
-
--- an expression
-data Exp =
+-- an valueression
+data Value =
     Name String
     | TypeName String
+    | NumLit String
     deriving (Show, Eq)
 
--- parse an expression
-exp :: Parser Exp
-exp = name
+-- parse an valueression
+value :: Parser Value
+value = ws *>
+    name
     <|> typeName
+    <|> numLit
 
--- lift the boolean operators to work on properties
-(<||>) :: (a-> Bool) -> (a->Bool) -> (a-> Bool)
-(<||>) = liftA2 (||)
 
-(<&&>) :: (a-> Bool) -> (a->Bool) -> (a-> Bool)
-(<&&>) = liftA2 (&&)
+
+ws :: Parser ()
+ws = const() <$> (many $ any_char `when` ((== ' ') <||> (== '\t')))
 
 -- parses a name ie an identifier
-name :: Parser Exp
+name :: Parser Value
 name = fmap Name $  (:)
     <$> (any_char `when` isAsciiLower)
     <*> (many $ any_char `when` (isAsciiLower <||> isDigit <||> (=='_')))
 
 -- parses a type name
-typeName :: Parser Exp
+typeName :: Parser Value
 typeName = fmap TypeName $ (:)
     <$> (any_char `when` isAsciiUpper)
     <*> (many $ any_char `when` (isAsciiUpper <||> isAsciiLower <||> isDigit))
 
+-- parses a number literal
+-- still keep it in string form
+-- since we do not know what size the string is gonna have
+-- besides, we want to embed the number literal in C code,
+-- so making it a number wouldn't be beneficial
+numLit :: Parser Value
+numLit = fmap NumLit $ some $ any_char `when` isDigit
 
+data Clause =
+    FnClause [Block]
+    deriving Show
 
-main = putStrLn $ show $ parse exp "hello_4U world"
+data Block =
+    ValueBlock Value
+    | ParenBlock Block
+    deriving Show
+
+clause :: Parser Clause
+clause = fnClause
+
+fnClause :: Parser Clause
+fnClause = fmap FnClause $
+    some ((optional ws) *> block)
+    <* optional(char '\n')
+
+block :: Parser Block
+block = 
+    valueBlock
+    <|> parenBlock
+
+valueBlock :: Parser Block
+valueBlock = ValueBlock <$> value
+
+parenBlock :: Parser Block
+parenBlock = fmap ParenBlock $
+    block `between` (char '(', char ')')
+
+main = do
+    file <- readFile "test.he"
+    print $ parse (clause) file
