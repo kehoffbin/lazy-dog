@@ -3,12 +3,13 @@ module Parser (
     Parser,
     parse,  -- only use at the end of parsing
     when,
-    between,
     any_char,
     char,
     string,
     (<||>),
-    (<&&>)
+    (<&&>),
+    some_sep_by,
+    many_sep_by
 ) where
 
 import Control.Monad (Monad)
@@ -58,9 +59,6 @@ when p pred = do
         then pure x
         else empty
 
-between :: Parser a -> (Parser b, Parser c) -> Parser a
-between mid (open, close) = open *> mid <* close
-
 -- parse the specific character c
 char :: Char -> Parser Char
 char c = any_char `when` (== c)
@@ -76,3 +74,13 @@ string (c:str) = (:) <$> char c <*> string str
 
 (<&&>) :: (a-> Bool) -> (a->Bool) -> (a-> Bool)
 (<&&>) = liftA2 (&&)
+
+
+-- like some and many, but with a delim interspersed
+some_sep_by :: Parser a -> Parser b -> Parser [a]
+some_sep_by item delim = (:)
+    <$> item
+    <*> (many $ delim *> item)
+
+many_sep_by :: Parser a -> Parser b -> Parser [a]
+many_sep_by item delim = (fmap concat) $ optional $ (some_sep_by item delim)

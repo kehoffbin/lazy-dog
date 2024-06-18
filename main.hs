@@ -5,28 +5,26 @@ import Control.Applicative
 import Data.Char
 import Text.Pretty.Simple
 
--- an valueression
+-- an value
 data Value =
     Name String
     | TypeName String
     | NumLit String
     deriving (Show, Eq)
 
--- parse an valueression
+-- parse a value
 value :: Parser Value
 value = ws *>
     name
     <|> typeName
     <|> numLit
 
-
-
 ws :: Parser ()
 ws = const() <$> (many $ any_char `when` ((== ' ') <||> (== '\t')))
 
 -- parses a name ie an identifier
 name :: Parser Value
-name = fmap Name $  (:)
+name = fmap Name $ (:)
     <$> (any_char `when` isAsciiLower)
     <*> (many $ any_char `when` (isAsciiLower <||> isDigit <||> (=='_')))
 
@@ -71,8 +69,8 @@ valueBlock = ValueBlock <$> value
 
 parenBlock :: Parser Block
 parenBlock = fmap ParenBlock $
-    block `between` (char '(', char ')')
+    (char '(') *> block <* (char ')')
 
 main = do
-    -- file <- readFile "test.he"
-    pPrint $ parse (name) "hello world"
+    file <- readFile "test.he"
+    pPrint $ parse (many_sep_by name (char ',')) file
