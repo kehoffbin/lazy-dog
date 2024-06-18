@@ -3,6 +3,7 @@ import Parser
 import Control.Monad (Monad)
 import Control.Applicative
 import Data.Char
+import Text.Pretty.Simple
 
 -- an valueression
 data Value =
@@ -73,5 +74,5 @@ parenBlock = fmap ParenBlock $
     block `between` (char '(', char ')')
 
 main = do
-    file <- readFile "test.he"
-    print $ parse (clause) file
+    -- file <- readFile "test.he"
+    pPrint $ parse (name) "hello world"
