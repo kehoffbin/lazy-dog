@@ -1,0 +1,25 @@
+-- tuple clause
+a, *
+
+-- fn clause
+, *
+a
+a b
+a b, *
+
+-- step 1: break into operators and values
+-- step 2: if it's a fn clause, bracket off the first value
+-- step 3: starting at the lowest precedence operator, bracket off
+-- step 4: function-apply from right to left
+
+5.add 5 .divide_by 7
+.x + .y
+
+
+(sin + cos) pi
+pi.(sin + cos)
+pi | sin + cos
+
+5 | square (+1)
+
+my_vector.each(**2).sum.sqrt

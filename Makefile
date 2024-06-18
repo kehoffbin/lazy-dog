@@ -1,4 +1,4 @@
-main: main.hs Parser.hs
+main: main.hs Parser.hs Token.hs
 	ghc -dynamic main.hs
 
 clean:

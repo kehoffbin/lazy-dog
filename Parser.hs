@@ -15,7 +15,7 @@ module Parser (
 import Control.Monad (Monad)
 import Control.Applicative
 import Data.Char
-
+ 
 -- parses start of a string
 -- if successful, returns some a and the remainder of the string
 newtype Parser a = Parser {parse :: String -> Maybe(a, String)}
