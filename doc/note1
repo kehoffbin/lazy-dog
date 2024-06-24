@@ -1,30 +1,19 @@
 while! x < 5:
-	x .= add 1
+	x +<- 1
 
-# declare x, assigning it a value of 3
+-- declare x, assigning it a value of 3
 let x = 3
+let x <- 3
 3 | let ->x
 
-# sets x to 4
-x = 4
+-- sets x to 4
+x <- 4
 4 -> x
 
-# returns an impure function that
-# when executed sets x to 4
-(x = 4)
-(x -> 4)
+-- returns an impure function that
+-- when executed sets x to 4
+\(x <- 4)
+\(4 -> x)
 
-# sets parameter x
-\x = 3
-3 -> \x
-
-# sets parameter x
-# if there is no local variable x
+-- sets parameter x
 x = 3
-3 -> x
-
-# an alias for  \x = x
-\=x
-
-# elementary symbols
-()[]{},|

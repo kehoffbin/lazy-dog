@@ -6,13 +6,26 @@ def main = fn:
 	if 5.divides i:
 		"buzz"
 	>> lift<Maybe> join delim="_"
-	else i.to_string
+	else i.to
 	print
 
 
 def None
 def Some T
 def Maybe T = Some T / None
+
+
+
+def f(x):Num -> Maybe<Num> = fn:
+	if x > 0:
+		Some x
+	else:
+		
+
+def if : (Bool, T) -> Maybe<T>:
+	b, t => match b:
+		True => Some t 
+		False => None
 
 
 
@@ -26,3 +39,9 @@ def as_mult:Add->Mult = fn:
 
 export as_mult
 
+def f = fn:
+	if a , b:
+		fjsdlfjsl
+	fsdlkfsd
+	fsdjifdslk
+	fdsjplk

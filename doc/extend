@@ -1,0 +1,5 @@
+-- in language core
+def extend<T,U,V>:(T->V), (U->V) -> (T/U ->V)
+
+def if(cond:Bool, then:T) -> Maybe<T> =
+	(True => Some t).extend(False => None)
