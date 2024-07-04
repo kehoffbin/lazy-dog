@@ -1,9 +1,9 @@
 # Hechle Overview
 this is a loose specification of the Hechle programming language.
-any remaining ambiguities are either
-- be inferred by what was probably meant
-- be amended to this document
-- be resolved in the way most easily implemented
+any remaining disambiguations are to be either
+- inferred from what was probably meant
+- amended to this document
+- or resolved in the way most easily implemented
 
 this is not a tutorial.
 
@@ -38,6 +38,8 @@ my_cool_variable
 deli2go
 call_9_1_1
 ```
+names don't start or end in `_`.
+
 type names are in `PascalCase`
 ```
 Str
@@ -223,44 +225,410 @@ in particular, for plain old values, the leading `,` is optional:
 add
 -- 3
 ```
+
+## Indentation
 the inside of parenthesis is an Expression, ie `(expression)`.
-to cram a Clause-Block into an Expression, use indentation
-```
-a (
-    clause1
-    clause2
-) b
-```
-alternatively, use `:`
-```
-f: clause1
-    clause2
-    clause3
-== f (
-    clause1
-    clause2
-    clause3
-)
-```
-be careful though. if you do not use `:`,
-the indent will be considered a tuple of expressions instead
+this is also the case for square brackets `[]`.
+
+Tuples can be constructed via indentation, ie
 ```
 exp1
     exp2
     exp3
-== exp1 (exp2, exp3)
+    exp4
 ```
-if `::` (followed by newline) is used instead of `:`, the indent is not necessary, ie
+is just `exp1 (exp2, exp3, exp4)`. 
+
+wrapping indentation in brackets is done like so:
 ```
-f::
-clause1
-clause2
+(
+    x
+    y
+)
 ```
-is equivalent to
+
+cramming a Clause into an Expression is done via `:`
 ```
-f:
+expression : clause
+```
+the leading `expression` can be omitted, although by convention
+you'd use the `do` function instead:
+```
+let my_lambda = do: x = 4
+```
+
+this affects indentation:
+```
+expression: clause
     clause1
     clause2
+```
+here, `clause1` and `clause2` are combined in a Clause-like manner.
+
+## Variables
+local variables can be declared using `let`-Clauses.
+```
+let x = 5
+x + 1
+-- returns 6
+```
+
+by default, all variables are immutable.
+variables can be declared mutable via `mut`
+```
+let mut x = 5
+x = 6
+x + 1
+-- returns 7
+```
+
+both `let` declarations and `=` assignments need to happen in a clause context.
+
+## Labels
+identifiers can also be used to label values.
+for example, in
+```
+let y = (x = 4)
+```
+the local variable `y` is of Type `x:Num`
+`x` is not a local variable however.
+
+labels are mainly used to build structs
+```
+let my_struct = [
+    x = 4
+    y = 5
+]
+```
+or to pass named arguments
+```
+range start=1, end=10, step=1
+```
+## Projections
+consider a struct
+```
+let my_struct = [x = 4, y = 5]
+```
+to retreive the field `x` we can use the projection function `x`
+```
+x(my_struct)
+my_struct.x
+```
+this only works if the compiler already knows that `my_struct` has a field `x`.
+otherwise, it will assume `x` is some locally defined function.
+
+to make it explicit that we want the projection, we can use `.x`.
+```
+(.x)(my_struct)
+my_struct.(.x)
+```
+this will allow the the compiler to infer that `my_struct` must have a field `x`:
+
+to make it explicit that we want a local function, use `::`
+```
+::x(my_struct)
+my_struct.::x
+```
+
+if `x` takes additional arguments besides `my_struct`, it is also assumed to
+be a local function.
+```
+my_struct.x(3)
+x(my_struct, 3)
+```
+
+if `x` is a field and also a function, you can do
+```
+x(my_struct)(3)
+(my_struct.x)(3)
+my_struct.x.eval(3)
+my_struct.x()(3)
+```
+
+# Types
+## Atomic Types and Number Types
+an Atomic Type is a Type that cannot be constructed from other Types.
+
+specifically, the Atomic Types of Hechle are the Number Types,
+representing signed, unsigned and floating numbers of various sizes
+```
+Num8, Num16, Num32, Num64
+UNum8, UNum16, UNum32, UNum64
+FNum32, FNum64, FNum128
+```
+
+## Product Types (Tuples)
+two Types `T` and `U` can be combined via `,` into their Product `T,U`.
+if `x` is of Type `T` and `y` of Type `U`, the Tuple `x,y` is of Type `T,U`.
+
+the Type Product is monoidal.
+the identity element is called the Unit Type and can be written as `()`
+```
+(T,U), V == T, (U, V)
+T,() == (),T == T
+```
+
+## Monotypes and Multitypes
+a Type `T` is called a Monotype if it represents a singlular value.
+specifically, each Atomic Type is a Monotype.
+
+a Multiyype is a Product of zero or more Monotypes.
+in particular, Monotypes are Multitypes.
+
+we can turn a Multitype `T` into a Monotype `[T]` by boxing.
+for example, `[Num32, FNum64, Num8]` is a Monotype.
+
+even for Monotypes, `T` is distinct from `[T]`
+`[]` is a Monotype, `()` isn't.
+
+## Function Types
+given two Multitypes `T` and `U`, the Type `T->U` represents the Function Type from `T` to `U`.
+
+a function with zero arguments is just a value:
+```
+()->T == T
+```
+
+## Union Types (Enums)
+given two Value Types `T` and `U`, the Type `T|U` is their Union.
+`T|U` is a Monotype.
+
+unioning is associative and commutative. it does not however have a neutral element
+```
+T | (U | V) == (T | U) | V == T | U | V
+T | U == U | T
+```
+two non-union Types are disjoint or identical. therefore
+```
+T | T == T
+```
+
+a value of `T` can be turned into a value of `T|U` via the builtin function `inject<T,U>`
+
+a function `T->V` and a function `U->V` can be turned into a function `T|U -> V`
+via the builtin `extend<T,U,V>`
+
+
+## Type Constructors
+A Type Constructor takes Types as arguments and constructs a (new) type from that.
+The Kind of Type constructors is written via `->`.
+
+For example `[_, _]` is a Type Constructor that takes two Monotypes `T` and `U`
+and spits out `[T,U]`
+
+Type Constructors themselves are Types.
+a Multitype is just a Type Constructor with zero arguments.
+
+all Type constructions above are Type Constructors.
+
+## Label Constructors
+for each identifier `x` there is the Type Constructor `x:`
+that turns a Monotype `T` into `x:T` corresponding to the label operator `x=`. 
+
+## Kinds
+Kinds sit one level above Types.
+
+Monotypes have kind `*`.
+
+Double Types (like `Num, Str`) have kind `**`, Triple Types have kind `***` and so on.
+
+Type Constructors have Kinds like `*->*` or `**->***`.
+
+examples:
+```
+Num         *
+Num, Str    **
+[_, _]      **->*
+[Num, _]    *->*
+(x:), Num   (*->*)*
+```
+
+## Type Lambdas
+Type Constructors can be written with a blank `_`.
+```
+[_, _]
+```
+each `_` matches one Monotype.
+
+taking differently kinded Types can be done via `__`.
+here, the Kind can be specified
+```
+[__{**}]        -- same as [_, _]
+[__{***}]       -- same as [_, _, _]
+```
+
+Type Constructos can also be written as lambdas
+```
+T => [T, T]
+```
+here, the Kind of the types is inferred (with the default being `*`)
+or explicitly annotated:
+```
+T:{**} => [T, T]
+```
+
+# Definitions
+## Type Definitions
+new Types can be created using Type definitions via the `type` keyword.
+```
+type MyNewType = SomeOldType
+```
+`MyNewType` is now an alias for `SomeOldType`.
+
+## Type Parameters
+if we have a Type Constructor, eg
+```
+type Box = [_]
+```
+then we can pass Type arguments via `<>`, like
+```
+Box<Num>       -- equals [Num]
+```
+
+there is also the following alternative syntax:
+```
+type Box<T> = [T]
+type T:Box = [T]
+```
+
+furthermore, single letter Type names are always assumed to be parameters,
+so the following works as well:
+```
+type Box = [T]
+```
+
+## Type Wrappers
+to create a brand new type, you can do
+```
+type MyNewType
+```
+`MyNewType` does not contain any data and is also different from all other types.
+
+you can also specify a parameter
+```
+type MyNewType<T>
+```
+this creates a brand new type for every Monotype `T`.
+
+In such case, we call `MyNewType` a Type Wrapper.
+
+
+impl Some
+
+
+
+## Kind Parameters
+we can define multiple Types under the same name via Kind parameters.
+```
+type Nums{*} = Num
+type Nums{**} = Num, Num
+type Nums{***} = Num, Num, Num
+```
+you don't need to give a definition for every possible Kind.
+for example, `Num{****}` is not defined.
+
+the above can be generalized via a Kind variable and recursion:
+```
+type Nums{} = ()
+type Nums{*a} = Num, Nums{a}
+```
+when computing `Nums{***}` for example, each definition is tested from top
+to bottom until one is found that works.
+
+Kind variables are in `snake_case` and typically single letters.
+
+multiple Kind parameters are done like so
+```
+type MyCrazyType{*a}{*}{b} = ...
+```
+
+## Implementations
+once we have types, we can add implementations
+```
+impl Type value
+```
+where `value` is of Type `Type`.
+
+for example
+```
+impl Num 5
+```
+then we can use `Num` as a value, for example
+```
+-- prints 5
+print! Num
+```
+5 is associated with the actual type `Num`, not the name `"Num"`,
+so if we do `type Alias = Num` then `Alias` will also evaluate
+to `5`.
+
+having `5` be stored as `Num` is really silly.
+instead we'd like to name it `five`.
+this can be done by implementing the labeled Type `five:Num`
+```
+impl five:Num five=5
+```
+now we can use it like
+```
+print! five<Num>
+```
+we still have to specify `<Num>` however because we could
+implement `five` for other types
+```
+impl five:Str five="five"
+```
+if we wanted `five` to just mean the number `5`,
+we'd need to implement the actual type constructor `five:_`.
+but `five:_` is not `Num`, so we cannot give `5` as implementation.
+
+to store one Type's implementation in another, use `value`
+```
+value five = five:Num
+impl five:Num five = 5
+```
+note that we cannot do `value five = 5` directly since `5` is not a type,
+only an implementation
+
+## Definitions
+since
+```
+value five = five:Num
+impl five:Num five = 5
+```
+is cumbersome, you can also write it as
+```
+def five = 5
+```
+## Constraints
+implementing a type constructor requires an implementation
+for every possible argument:
+```
+impl (T=>T->T) 
+    x => x
+```
+```
+impl T:(T->T)
+    x => x
+```
+
+at the beginning of an implementation (or definition),
+we can provide a list of types that need to have an implementation
+```
+def<add:(T,T->T)> double<T>(x) = add(x,x)
+```
+this can be used to build traits
+```
+type T:Add =
+    zero:T
+    add:T,T -> T
+
+def<T:Add> double<T>(x) = add(x,x)
+```
+the `trait` keyword is an alias for `type` but without the `=`
+```
+trait T:Add
+    zero:T
+    add:T,T->T
 ```
 
 # Modules
@@ -282,7 +650,7 @@ file names in Hechle are in `dash-case` and have the `.he` extension.
 ```
 mod FileName::
 ```
-is implicitly added at the top, where FileName is the PascalCase-ified version of the file name.
+is implicitly added at the top of each file, where FileName is the PascalCase-ified version of the file name.
 
 if a module contains multiple submodules of the same name, they are joined
 
@@ -357,65 +725,3 @@ to export a different symbol, use
 ```
 export symbol
 ```
-
-# Types
-## Atomic Types and Number Types
-an Atomic Type is a Type that cannot be constructed from other Types.
-
-specifically, the Atomic Types of Hechle are the Number Types,
-representing signed, unsigned and floating numbers of various sizes
-```
-Num8, Num16, Num32, Num64
-UNum8, UNum16, UNum32, UNum64
-FNum32, FNum64, FNum128
-```
-
-## Product Types (Tuples)
-two Types `T` and `U` can be combined via `,` into their Product `T,U`.
-if `x` is of Type `T` and `y` of Type `U`, the Tuple `x,y` is of Type `T,U`.
-
-the Type Product is monoidal.
-the identity element is called the Unit Type or Empty Type and can be written as `()`
-```
-(T,U), V == T, (U, V)
-T,() == (),T == T
-```
-
-a Type `T` is called a Monotype if it represents a singlular value.
-specifically, each Atomic Type is a Monotype.
-
-a Multitype is a Product of Monotypes.
-in particular, Monotypes are Multitypes.
-
-instead of Multitype we sometimes also say Value Types because they are the only
-kind of inhabited Type, ie representing data.
-
-by (proper) Multitype we sometimes also mean non-mono Value Types.
-
-## Boxed Types
-we can turn a Multitype `T` into a Monotype `[T]` by boxing.
-for example, `[Num32, FNum64, Num8]` is a Monotype.
-
-even for Monotypes, `T` is distinct from `[T]`
-
-## Function Types
-given two Multitypes `T` and `U`, the Type `T->U` represents the Function Type from `T` to `U`.
-
-## Union Types (Enums)
-given two Monotypes `T` and `U`, the Type `T|U` is their Union.
-`T|U` is a Monotype again.
-
-unioning is associative and commutative. it does not however have a neutral element
-```
-T | (U | V) == (T | U) | V == T | U | V
-T | U == U | T
-```
-two non-union Types are disjoint or identical. therefore
-```
-T | T == T
-```
-a value of `T` can be turned into a value of `T|U` via the builtin function `inject<T,U>`
-
-a function `T->V` and a function `U->V` can be turned into a function `T|U -> V`
-via the builtin `extend<T,U,V>`
-

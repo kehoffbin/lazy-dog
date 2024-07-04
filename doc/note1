@@ -1,5 +1,5 @@
 while! x < 5:
-	x +<- 1
+	x += 1
 
 -- declare x, assigning it a value of 3
 let x = 3
@@ -17,3 +17,6 @@ x <- 4
 
 -- sets parameter x
 x = 3
+
+
+
